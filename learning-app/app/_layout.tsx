@@ -24,7 +24,7 @@ function RootLayoutNav() {
   const { session, loading, profile } = useAuth();
 
   const [loaded] = useFonts({
-    GeistMono: require('../assets/fonts/Geist-Regular.ttf'),
+    GeistMono: require('@/assets/fonts/Geist-Regular.ttf'),
   });
 
   if (loading) {

@@ -1,25 +1,147 @@
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import React from 'react';
-import {
-  scale,
-  verticalScale,
-  moderateScale
-} from 'react-native-size-matters'
+import React, { useEffect, useState } from 'react';
+import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Colors } from '@/constants/theme';
-import { ThemedText } from '../themed-text';
-import { VideoView } from "expo-video"
+import { useVideoPlayer, VideoView } from 'expo-video';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { useFonts, EBGaramond_500Medium_Italic } from '@expo-google-fonts/eb-garamond';
 
-const { width, height } = Dimensions.get("window")
-const videoSource = require("@/assets/videos/broll.mp4")
+
+const { width, height } = Dimensions.get('window');
+const videoSource = require('@/assets/videos/broll.mp4');
 
 const MENU_HEIGHT = 250;
 const PEEK_MENU_HEIGHT = 50;
 const CLOSED_POSITION = MENU_HEIGHT - PEEK_MENU_HEIGHT;
 
 export default function IntroScreen() {
+  const [currentPhraseIndex, useCurrentPhraseIndex] = useState(0);
+  const mainTextOpacity = useSharedValue(0);
+  const scriptTextOpacity = useSharedValue(0);
+
+  const [fontsLoaded] = useFonts({
+    EBGaramond_500Medium_Italic
+  });
+
+  // Изучай Английский прямо сейчас, Начни ...
+  const mainTextWords: string[] = [
+    'Изучай',
+    'English',
+    'прямо',
+    'сейчас,',
+    'Начни',
+  ];
+  const scriptPhrases: string[] = [
+    'Говорить',
+    'Учить',
+    'Использовать',
+    'Применять',
+  ];
+
+  const player = useVideoPlayer(videoSource, (player) => {
+    /*
+      the video will play indefinitely
+      in the background
+    */
+    player.loop = true;
+    player.muted = true; // turn off the sound on the video
+    player.play();
+  });
+
+  const mainTextAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      mainTextOpacity.value,
+      [0, 1],
+      [30, 0],
+      Extrapolation.CLAMP
+    );
+
+    return {
+      opacity: mainTextOpacity.value,
+      transform: [{ translateY }],
+    };
+  });
+
+  const scriptTextAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scriptTextOpacity.value,
+      [0, 1],
+      [20, 0],
+      Extrapolation.CLAMP
+    );
+
+    return {
+      opacity: scriptTextOpacity.value,
+      transform: [{ translateY }],
+    };
+  });
+
+  const animatedTextIn = () => {
+    mainTextOpacity.value = withTiming(1, { duration: 1200 });
+    scriptTextOpacity.value = withDelay(800, withTiming(1, { duration: 1200 }));
+  };
+
+  useEffect(() => {
+    player.play();
+
+    const timeout = setTimeout(() => {
+      animatedTextIn();
+    }, 300);
+  }, []);
+
+  if (!fontsLoaded) {
+    return null
+  }
+
   return (
-    <View className='flex-1 bg-black'>
-      <VideoView nativeControls={false} />
+    <View className="flex-1 bg-black">
+      <VideoView
+        nativeControls={false}
+        player={player}
+        contentFit="cover"
+        style={[StyleSheet.absoluteFill, { width, height }]}
+      />
+      {/* overlay */}
+      <View style={[StyleSheet.absoluteFill]} className="bg-black/40 z-[20]" />
+      {/* hero text section */}
+      <View
+        className="left-[30px] right-[30px] z-[25] absolute"
+        style={{ top: height * 0.14 }}
+      >
+        <Animated.View className="mb-0" style={[mainTextAnimatedStyle]}>
+          <Text
+            className="font-extrabold text-[#ece1c8] tracking-normal"
+            style={{
+              fontFamily: 'System',
+              fontSize: verticalScale(45),
+              lineHeight: verticalScale(50),
+            }}
+          >
+            {mainTextWords.join(' ')}
+          </Text>
+        </Animated.View>
+        <Animated.View style={[scriptTextAnimatedStyle]}>
+          <Text
+            className="italic"
+            style={{
+              color: Colors.primaryAccentColor,
+              letterSpacing: 0.5,
+              fontSize: verticalScale(55),
+              fontFamily: 'EBGaramond_500Medium_Italic',
+            }}
+          >
+            {scriptPhrases[currentPhraseIndex]}
+          </Text>
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -118,29 +240,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '500',
     letterSpacing: -0.2,
-  },
-  heroTextContainer: {
-    position: 'absolute',
-    top: height * 0.15,
-    left: 30,
-    right: 30,
-    zIndex: 25,
-  },
-  mainTextContainer: {
-    marginBottom: 0,
-  },
-  heroTextMain: {
-    fontSize: verticalScale(45),
-    fontWeight: '800',
-    fontFamily: 'System',
-    color: '#fff4cc',
-    lineHeight: verticalScale(50),
-    letterSpacing: 0,
-  },
-  heroTextScript: {
-    fontSize: verticalScale(55),
-    fontFamily: 'EBGaramond_500Medium_Italic',
-    color: Colors.primaryAccentColor,
-    letterSpacing: 0.5,
   },
 });
