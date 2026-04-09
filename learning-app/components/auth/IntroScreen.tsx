@@ -12,8 +12,10 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { useFonts, EBGaramond_500Medium_Italic } from '@expo-google-fonts/eb-garamond';
-
+import {
+  useFonts,
+  EBGaramond_500Medium_Italic,
+} from '@expo-google-fonts/eb-garamond';
 
 const { width, height } = Dimensions.get('window');
 const videoSource = require('@/assets/videos/broll.mp4');
@@ -23,12 +25,12 @@ const PEEK_MENU_HEIGHT = 50;
 const CLOSED_POSITION = MENU_HEIGHT - PEEK_MENU_HEIGHT;
 
 export default function IntroScreen() {
-  const [currentPhraseIndex, useCurrentPhraseIndex] = useState(0);
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const mainTextOpacity = useSharedValue(0);
   const scriptTextOpacity = useSharedValue(0);
 
   const [fontsLoaded] = useFonts({
-    EBGaramond_500Medium_Italic
+    EBGaramond_500Medium_Italic,
   });
 
   // Изучай Английский прямо сейчас, Начни ...
@@ -36,15 +38,10 @@ export default function IntroScreen() {
     'Изучай',
     'English',
     'прямо',
-    'сейчас,',
+    'сейчас!',
     'Начни',
   ];
-  const scriptPhrases: string[] = [
-    'Говорить',
-    'Учить',
-    'Использовать',
-    'Применять',
-  ];
+  const scriptPhrases: string[] = ['Speaking', 'Learning', 'Using', 'Applying'];
 
   const player = useVideoPlayer(videoSource, (player) => {
     /*
@@ -89,16 +86,67 @@ export default function IntroScreen() {
     scriptTextOpacity.value = withDelay(800, withTiming(1, { duration: 1200 }));
   };
 
+  const animatedScriptOut = () => {
+    scriptTextOpacity.value = withTiming(0, { duration: 500 });
+  };
+
+  const animatedScriptIn = () => {
+    scriptTextOpacity.value = withTiming(1, { duration: 600 });
+  };
+
   useEffect(() => {
     player.play();
 
     const timeout = setTimeout(() => {
       animatedTextIn();
     }, 300);
+
+    /*
+      wait 3.5s (reading time)
+      start fade out
+      wait 0.5s (animation time)
+      change word (invisible)
+      wait 0.15s (small pause)
+      start fade in
+    */
+    const cycleInterval = setInterval(() => {
+      animatedScriptOut();
+      setTimeout(() => {
+        setCurrentPhraseIndex((prev) => {
+          const nextIndex = (prev + 1) % scriptPhrases.length;
+
+          if (nextIndex === 0) {
+            setTimeout(() => animatedScriptIn(), 150)
+          }
+
+          return nextIndex;
+        });
+      }, 500);
+    }, 3500);
+    /*
+      avoiding memory leaks when
+      rendering new words
+    */
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(cycleInterval);
+    };
   }, []);
 
+  useEffect(() => {
+    if (currentPhraseIndex > 0) {
+      const timeout = setTimeout(() => {
+        animatedScriptIn()
+      }, 150);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [currentPhraseIndex])
+
   if (!fontsLoaded) {
-    return null
+    return null;
   }
 
   return (
@@ -110,7 +158,7 @@ export default function IntroScreen() {
         style={[StyleSheet.absoluteFill, { width, height }]}
       />
       {/* overlay */}
-      <View style={[StyleSheet.absoluteFill]} className="bg-black/40 z-[20]" />
+      <View style={[StyleSheet.absoluteFill]} className="bg-black/50 z-[20]" />
       {/* hero text section */}
       <View
         className="left-[30px] right-[30px] z-[25] absolute"
@@ -118,7 +166,7 @@ export default function IntroScreen() {
       >
         <Animated.View className="mb-0" style={[mainTextAnimatedStyle]}>
           <Text
-            className="font-extrabold text-[#ece1c8] tracking-normal"
+            className="font-extrabold text-[#fbfbfb] tracking-normal"
             style={{
               fontFamily: 'System',
               fontSize: verticalScale(45),
