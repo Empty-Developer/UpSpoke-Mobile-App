@@ -1,4 +1,13 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Keyboard,
+  Platform,
+  Image,
+  Pressable,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 import { Colors } from '@/constants/theme';
@@ -16,18 +25,29 @@ import {
   useFonts,
   EBGaramond_500Medium_Italic,
 } from '@expo-google-fonts/eb-garamond';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AntDesign from "@expo/vector-icons/AntDesign"
+import Fontisto from "@expo/vector-icons/Fontisto"
+// import { Pressable } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
 const videoSource = require('@/assets/videos/broll.mp4');
+const logoSource = require("@/assets/images/logo.png")
 
 const MENU_HEIGHT = 250;
 const PEEK_MENU_HEIGHT = 50;
 const CLOSED_POSITION = MENU_HEIGHT - PEEK_MENU_HEIGHT;
 
 export default function IntroScreen() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const insets = useSafeAreaInsets();
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const mainTextOpacity = useSharedValue(0);
   const scriptTextOpacity = useSharedValue(0);
+  const menuTranslateY = useSharedValue(CLOSED_POSITION);
+  const [KeyboardHeight, setKeyboardHeight] = useState(0);
+  const [currentView, setCurrentView] = useState<"login" | "email">("login")
+  const menuContentOpacity = useSharedValue(1)
 
   const [fontsLoaded] = useFonts({
     EBGaramond_500Medium_Italic,
@@ -81,6 +101,19 @@ export default function IntroScreen() {
     };
   });
 
+  // menu
+  const menuAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: menuTranslateY.value }],
+    };
+  });
+
+  const menuContentAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: menuContentOpacity.value
+    };
+  });
+
   const animatedTextIn = () => {
     mainTextOpacity.value = withTiming(1, { duration: 1200 });
     scriptTextOpacity.value = withDelay(800, withTiming(1, { duration: 1200 }));
@@ -92,6 +125,20 @@ export default function IntroScreen() {
 
   const animatedScriptIn = () => {
     scriptTextOpacity.value = withTiming(1, { duration: 600 });
+  };
+
+  const animatedMenu = (open: boolean) => {
+    menuTranslateY.value = withSpring(open ? 0 : CLOSED_POSITION, {
+      damping: 95,
+      stiffness: 320,
+      mass: 7
+    })
+  };
+
+  const handlePress = () => {
+    const newState = !isMenuOpen;
+    setIsMenuOpen(newState);
+    animatedMenu(newState);
   };
 
   useEffect(() => {
@@ -116,7 +163,7 @@ export default function IntroScreen() {
           const nextIndex = (prev + 1) % scriptPhrases.length;
 
           if (nextIndex === 0) {
-            setTimeout(() => animatedScriptIn(), 150)
+            setTimeout(() => animatedScriptIn(), 150);
           }
 
           return nextIndex;
@@ -136,18 +183,105 @@ export default function IntroScreen() {
   useEffect(() => {
     if (currentPhraseIndex > 0) {
       const timeout = setTimeout(() => {
-        animatedScriptIn()
+        animatedScriptIn();
       }, 150);
 
       return () => {
         clearTimeout(timeout);
       };
     }
-  }, [currentPhraseIndex])
+  }, [currentPhraseIndex]);
+
+  // sliding menu
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (event) => {
+        setKeyboardHeight(event.endCoordinates.height);
+      }
+    );
+
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      (event) => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener?.remove();
+      keyboardWillHideListener?.remove();
+    };
+  }, []);
 
   if (!fontsLoaded) {
     return null;
   }
+
+  // function render login view
+  const renderLoginView = () => (
+    <Animated.View className='flex-1' style={[menuContentAnimatedStyle]}>
+      <View className='justify-between mt-[20px] mb-[24px] px-[10px] flex-row items-center'>
+        <View className='flex-row flex-1 items-center'>
+          <Image source={logoSource} className='w-[25px] h-[25px] mr-[5px] rounded-xl'/>
+          <Text className='text-[18px] font-bold text-white'>UpSpoke</Text>
+        </View>
+        <View className='items-center'>
+          <Text className='text-base font-semibold text-white'>Let's go!</Text>
+        </View>
+      </View>
+      <View className='gap-4'>
+        {/* Apple */}
+        <Pressable
+          className='px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40'
+          onPress={() => console.log("Apple login")}
+        >
+          <AntDesign
+            name="apple"
+            size={16}
+            color="white"
+            className='mr-[12px]'
+          />
+          <Text className='tracking-[-0.2px] font-medium text-white text-[17px]'>
+            Войти с помощью Apple
+          </Text>
+        </Pressable>
+        {/* Google */}
+        <Pressable
+          className='px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40'
+          onPress={() => console.log("Google login")}
+        >
+          <AntDesign
+            name="google"
+            size={16}
+            color="white"
+            className='mr-[12px]'
+          />
+          <Text className='tracking-[-0.2px] font-medium text-white text-[17px]'>
+            Войти с помощью Google
+          </Text>
+        </Pressable>
+        {/* Email */}
+        <Pressable
+          className='px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40'
+          onPress={() => console.log("Email login")}
+        >
+          <Fontisto
+            name="email"
+            size={16}
+            color="white"
+            className='mr-[12px]'
+          />
+          <Text className='tracking-[-0.2px] font-medium text-white text-[17px]'>
+            Войти с помощью Email
+          </Text>
+        </Pressable>
+      </View>
+    </Animated.View>
+  )
+
+  const dynamicMenuHeight =
+    KeyboardHeight > 0 ? MENU_HEIGHT + KeyboardHeight + 50 : MENU_HEIGHT + 100;
 
   return (
     <View className="flex-1 bg-black">
@@ -190,103 +324,32 @@ export default function IntroScreen() {
           </Text>
         </Animated.View>
       </View>
+      {/* sliding menu with dynamic heigh */}
+      {/* TODO: gesture handler */}
+      <Animated.View
+        style={[
+          { height: MENU_HEIGHT + 100 },
+          menuAnimatedStyle,
+          { height: dynamicMenuHeight, paddingBottom: insets.bottom + 30 },
+        ]}
+        className="bottom-0 left-0 right-0 bg-black/60 z-[30] absolute border-white/15 border-r-[1.5px] border-l-[1.5px] border-t-[1.5px] rounded-t-[24px]"
+      >
+        <Pressable
+          style={{
+            paddingVertical: 12,
+            alignItems: 'center',
+          }}
+          onPress={handlePress}
+        >
+          <View className="w-[40px] h-[4px] bg-white/50 rounded-full" />
+        </Pressable>
+
+        <View
+          className='flex-1 px-[30px]'
+        >
+          {currentView === "login" ? renderLoginView() : null}
+        </View>
+      </Animated.View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  menuContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: MENU_HEIGHT + 100,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderTopWidth: 1.5,
-    borderLeftWidth: 1.5,
-    borderRightWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-    zIndex: 30,
-  },
-  handleContainer: {
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 2,
-  },
-  menuContent: {
-    flex: 1,
-    paddingHorizontal: 30,
-  },
-  viewContainer: {
-    flex: 1,
-  },
-  logoSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 20,
-    marginBottom: 24,
-    paddingHorizontal: 10,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  logo: {
-    width: 25,
-    height: 25,
-    marginRight: 5,
-    borderRadius: 12,
-  },
-  appName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: 'white',
-  },
-  statsContainer: {
-    alignItems: 'center',
-  },
-  rating: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
-  buttonsContainer: {
-    gap: 16,
-  },
-  loginButton: {
-    backgroundColor: 'rgba(60, 60, 67, 0.8)',
-    borderColor: 'rgba(120, 120, 128, 0.4)',
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-  },
-  appleIcon: {
-    marginRight: 12,
-  },
-  googleIcon: {
-    marginRight: 12,
-  },
-  emailIcon: {
-    marginRight: 12,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: '500',
-    letterSpacing: -0.2,
-  },
-});
