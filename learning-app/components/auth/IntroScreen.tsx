@@ -29,6 +29,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import EmailAuth from './EmailAuth';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 // import { Pressable } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
@@ -130,9 +131,9 @@ export default function IntroScreen() {
 
   const animatedMenu = (open: boolean) => {
     menuTranslateY.value = withSpring(open ? 0 : CLOSED_POSITION, {
-      damping: 95,
-      stiffness: 320,
-      mass: 7,
+      damping: 30,
+      stiffness: 200,
+      mass: 1,
     });
   };
 
@@ -155,6 +156,34 @@ export default function IntroScreen() {
     setIsMenuOpen(newState);
     animatedMenu(newState);
   };
+
+  // gesture handler
+  const panGesture = Gesture.Pan().onEnd((event) => {
+    // nitro bust for UI
+    /*
+      makes the stream work only on
+      UI and does not touch the js stream
+    */
+    "worklet"
+
+    const swipeThreshold = 59;
+    const isUpSwipe = event.translationY < -swipeThreshold;
+    const isDownSwipe = event.translationY > swipeThreshold;
+
+    if (isUpSwipe) {
+      menuTranslateY.value = withSpring(0, {
+        damping: 80,
+        stiffness: 380,
+        mass: 3,
+      })
+    } else if (isDownSwipe) {
+      menuTranslateY.value = withSpring(CLOSED_POSITION, {
+        damping: 80,
+        stiffness: 380,
+        mass: 3,
+      })
+    }
+  })
 
   useEffect(() => {
     player.play();
@@ -251,7 +280,7 @@ export default function IntroScreen() {
       <View className="gap-4">
         {/* Apple */}
         <Pressable
-          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-2xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
           onPress={() => console.log('Apple login')}
         >
           <AntDesign
@@ -266,7 +295,7 @@ export default function IntroScreen() {
         </Pressable>
         {/* Google */}
         <Pressable
-          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-2xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
           onPress={() => console.log('Google login')}
         >
           <AntDesign
@@ -281,7 +310,7 @@ export default function IntroScreen() {
         </Pressable>
         {/* Email */}
         <Pressable
-          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-2xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
           onPress={() =>animatedToEmailView('email')}
         >
           <Fontisto
@@ -351,28 +380,30 @@ export default function IntroScreen() {
       </View>
       {/* sliding menu with dynamic heigh */}
       {/* TODO: gesture handler */}
-      <Animated.View
-        style={[
-          { height: MENU_HEIGHT + 100 },
-          menuAnimatedStyle,
-          { height: dynamicMenuHeight, paddingBottom: insets.bottom + 30 },
-        ]}
-        className="bottom-0 left-0 right-0 bg-black/60 z-[30] absolute border-white/15 border-r-[1.5px] border-l-[1.5px] border-t-[1.5px] rounded-t-[24px]"
-      >
-        <Pressable
-          style={{
-            paddingVertical: 12,
-            alignItems: 'center',
-          }}
-          onPress={handlePress}
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          style={[
+            { height: MENU_HEIGHT + 100 },
+            menuAnimatedStyle,
+            { height: dynamicMenuHeight, paddingBottom: insets.bottom + 30 },
+          ]}
+          className="bottom-0 left-0 right-0 bg-black/60 z-[30] absolute border-white/15 border-r-[1.5px] border-l-[1.5px] border-t-[1.5px] rounded-t-[24px]"
         >
-          <View className="w-[40px] h-[4px] bg-white/50 rounded-full" />
-        </Pressable>
+          <Pressable
+            style={{
+              paddingVertical: 12,
+              alignItems: 'center',
+            }}
+            onPress={handlePress}
+          >
+            <View className="w-[40px] h-[4px] bg-white/50 rounded-full" />
+          </Pressable>
 
-        <View className="flex-1 px-[30px]">
-          {currentView === 'login' ? renderLoginView() : renderEmailView()}
-        </View>
-      </Animated.View>
+          <View className="flex-1 px-[30px]">
+            {currentView === 'login' ? renderLoginView() : renderEmailView()}
+          </View>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 }

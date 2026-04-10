@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#79021F",
+        "backgroundColor": "#91B829",
         "foregroundImage": "./assets/images/android-icon.png"
       },
       "edgeToEdgeEnabled": true,
@@ -34,7 +34,7 @@
           "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#79021F"
+          "backgroundColor": "#91B829"
         }
       ],
       "expo-secure-store",

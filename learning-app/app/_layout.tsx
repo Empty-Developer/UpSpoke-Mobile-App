@@ -14,6 +14,8 @@ import { ActivityIndicator, View } from 'react-native';
 import React from 'react';
 import IntroScreen from '@/components/auth/IntroScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Toaster } from "sonner-native"
+import { useDeepLinking } from '@/hooks/use-deep-linking';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -26,7 +28,10 @@ function RootLayoutNav() {
     GeistMono: require('@/assets/fonts/Geist-Regular.ttf'),
   });
 
-  if (loading) {
+  // handle deep linking for links
+  useDeepLinking()
+
+  if (!loading && loading) {
     return (
       <View className="flex-1">
         <ActivityIndicator size={'large'} color="white" />
@@ -43,6 +48,7 @@ function RootLayoutNav() {
         when opening the application*/}
         <GestureHandlerRootView className="flex-1">
           <IntroScreen />
+          <Toaster />
         </GestureHandlerRootView>
       </ThemeProvider>
     );
@@ -57,6 +63,7 @@ function RootLayoutNav() {
           options={{ presentation: 'modal', title: 'Modal' }}
         />
       </Stack>
+      <Toaster />
       <StatusBar style="auto" />
     </ThemeProvider>
   );

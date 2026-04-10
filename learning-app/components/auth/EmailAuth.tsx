@@ -3,6 +3,10 @@ import { supabase } from '@/utils/supabase';
 import Entypo from '@expo/vector-icons/Entypo';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { toast } from "sonner-native"
+import { makeRedirectUri } from "expo-auth-session"
+
+const redirectTo = makeRedirectUri()
 
 export default function EmailAuth({
   onBack,
@@ -17,6 +21,31 @@ export default function EmailAuth({
   const signInWithEmail = async () => {
     if (!email) {
       // toast
+      toast.error("Пожалуйста введите адрес электронной почты!")
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: redirectTo,
+        }
+      })
+
+      if (error) {
+        toast.error(error.message)
+        throw error;
+      } else {
+        toast.success("Ура! Посмотрите вашу почту, для перехода по ссылке")
+      }
+
+    } catch (error) {
+        toast.error("Кажеться что-то пошло не так. Попробуйте еще раз!")
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -40,7 +69,7 @@ export default function EmailAuth({
       <View className="gap-5">
         <View className="gap-2">
           <TextInput
-            className="px-4 py-4 text-[16px] text-white bg-white/10 border-white/20 border-[1px] rounded-lg min-h-[52px]"
+            className="px-4 py-4 text-[16px] text-white bg-white/10 border-white/20 border-[1px] rounded-2xl min-h-[52px]"
             value={email}
             onChangeText={setEmail}
             placeholder="Email"
@@ -51,9 +80,9 @@ export default function EmailAuth({
           />
         </View>
         <Pressable
-          className={`bg-[#D4FF5F] rounded-lg px-5 py-4 items-center justify-center mt-[10px] min-h-[52px] ${loading ? 'opacity-60' : ''}`}
+          className={`bg-[#D4FF5F] rounded-2xl px-5 py-4 items-center justify-center mt-[10px] min-h-[52px] ${loading ? 'opacity-60' : ''}`}
           disabled={loading}
-          onPress={() => {}}
+          onPress={signInWithEmail}
         >
           <Text className="text-black text-[16px] font-semibold leading-[-0.2px]">
             {loading ? 'Отправка...' : 'Отправить'}
