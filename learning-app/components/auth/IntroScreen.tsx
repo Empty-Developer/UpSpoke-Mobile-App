@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+import { verticalScale } from 'react-native-size-matters';
 import { Colors } from '@/constants/theme';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import Animated, {
@@ -26,13 +26,14 @@ import {
   EBGaramond_500Medium_Italic,
 } from '@expo-google-fonts/eb-garamond';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AntDesign from "@expo/vector-icons/AntDesign"
-import Fontisto from "@expo/vector-icons/Fontisto"
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import EmailAuth from './EmailAuth';
 // import { Pressable } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
 const videoSource = require('@/assets/videos/broll.mp4');
-const logoSource = require("@/assets/images/logo.png")
+const logoSource = require('@/assets/images/logo.png');
 
 const MENU_HEIGHT = 250;
 const PEEK_MENU_HEIGHT = 50;
@@ -46,8 +47,8 @@ export default function IntroScreen() {
   const scriptTextOpacity = useSharedValue(0);
   const menuTranslateY = useSharedValue(CLOSED_POSITION);
   const [KeyboardHeight, setKeyboardHeight] = useState(0);
-  const [currentView, setCurrentView] = useState<"login" | "email">("login")
-  const menuContentOpacity = useSharedValue(1)
+  const [currentView, setCurrentView] = useState<'login' | 'email'>('login');
+  const menuContentOpacity = useSharedValue(1);
 
   const [fontsLoaded] = useFonts({
     EBGaramond_500Medium_Italic,
@@ -110,7 +111,7 @@ export default function IntroScreen() {
 
   const menuContentAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: menuContentOpacity.value
+      opacity: menuContentOpacity.value,
     };
   });
 
@@ -131,8 +132,22 @@ export default function IntroScreen() {
     menuTranslateY.value = withSpring(open ? 0 : CLOSED_POSITION, {
       damping: 95,
       stiffness: 320,
-      mass: 7
-    })
+      mass: 7,
+    });
+  };
+
+  const animatedToEmailView = (to: 'email' | 'login') => {
+    /*
+      I`m replacing the content and when
+      it completely disappears I`ll replace 
+      it with new content
+    */
+    menuContentOpacity.value = withTiming(0, { duration: 200 });
+
+    setTimeout(() => {
+      setCurrentView(to);
+      menuContentOpacity.value = withTiming(1, { duration: 300 });
+    }, 200);
   };
 
   const handlePress = () => {
@@ -220,65 +235,75 @@ export default function IntroScreen() {
 
   // function render login view
   const renderLoginView = () => (
-    <Animated.View className='flex-1' style={[menuContentAnimatedStyle]}>
-      <View className='justify-between mt-[20px] mb-[24px] px-[10px] flex-row items-center'>
-        <View className='flex-row flex-1 items-center'>
-          <Image source={logoSource} className='w-[25px] h-[25px] mr-[5px] rounded-xl'/>
-          <Text className='text-[18px] font-bold text-white'>UpSpoke</Text>
+    <Animated.View className="flex-1" style={[menuContentAnimatedStyle]}>
+      <View className="justify-between mt-[20px] mb-[24px] px-[10px] flex-row items-center">
+        <View className="flex-row flex-1 items-center">
+          <Image
+            source={logoSource}
+            className="w-[25px] h-[25px] mr-[5px] rounded-xl"
+          />
+          <Text className="text-[18px] font-bold text-white">UpSpoke</Text>
         </View>
-        <View className='items-center'>
-          <Text className='text-base font-semibold text-white'>Let's go!</Text>
+        <View className="items-center">
+          <Text className="text-base font-semibold text-white">Let's go!</Text>
         </View>
       </View>
-      <View className='gap-4'>
+      <View className="gap-4">
         {/* Apple */}
         <Pressable
-          className='px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40'
-          onPress={() => console.log("Apple login")}
+          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          onPress={() => console.log('Apple login')}
         >
           <AntDesign
             name="apple"
             size={16}
             color="white"
-            className='mr-[12px]'
+            className="mr-[12px]"
           />
-          <Text className='tracking-[-0.2px] font-medium text-white text-[17px]'>
+          <Text className="tracking-[-0.2px] font-medium text-white text-[17px]">
             Войти с помощью Apple
           </Text>
         </Pressable>
         {/* Google */}
         <Pressable
-          className='px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40'
-          onPress={() => console.log("Google login")}
+          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          onPress={() => console.log('Google login')}
         >
           <AntDesign
             name="google"
             size={16}
             color="white"
-            className='mr-[12px]'
+            className="mr-[12px]"
           />
-          <Text className='tracking-[-0.2px] font-medium text-white text-[17px]'>
+          <Text className="tracking-[-0.2px] font-medium text-white text-[17px]">
             Войти с помощью Google
           </Text>
         </Pressable>
         {/* Email */}
         <Pressable
-          className='px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40'
-          onPress={() => console.log("Email login")}
+          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          onPress={() =>animatedToEmailView('email')}
         >
           <Fontisto
             name="email"
             size={16}
             color="white"
-            className='mr-[12px]'
+            className="mr-[12px]"
           />
-          <Text className='tracking-[-0.2px] font-medium text-white text-[17px]'>
+          <Text className="tracking-[-0.2px] font-medium text-white text-[17px]">
             Войти с помощью Email
           </Text>
         </Pressable>
       </View>
     </Animated.View>
-  )
+  );
+
+  const renderEmailView = () => (
+    <EmailAuth
+      onBack={() => animatedToEmailView('login')}
+      menuContentAnimatedStyle={menuContentAnimatedStyle}
+    />
+  );
 
   const dynamicMenuHeight =
     KeyboardHeight > 0 ? MENU_HEIGHT + KeyboardHeight + 50 : MENU_HEIGHT + 100;
@@ -344,10 +369,8 @@ export default function IntroScreen() {
           <View className="w-[40px] h-[4px] bg-white/50 rounded-full" />
         </Pressable>
 
-        <View
-          className='flex-1 px-[30px]'
-        >
-          {currentView === "login" ? renderLoginView() : null}
+        <View className="flex-1 px-[30px]">
+          {currentView === 'login' ? renderLoginView() : renderEmailView()}
         </View>
       </Animated.View>
     </View>

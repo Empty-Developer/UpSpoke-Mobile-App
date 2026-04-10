@@ -8,10 +8,9 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
 import '@/global.css';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import AuthProvider from '@/providers/AuthProvider';
 import { useAuth } from '@/context/AuthContext';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import React from 'react';
 import IntroScreen from '@/components/auth/IntroScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -70,12 +69,3 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
-
-const style = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-  },
-});
