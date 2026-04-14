@@ -38,8 +38,9 @@ function RootLayoutNav() {
 
   // user are immediately redirected to the screen, sipping th registration screen
   useEffect(() => {
+    if (loading || !loaded) return
     // all data user, I use it for requests
-    if (!profile || !profile.onboarding_completed) {
+    if (session && (!profile || !profile.onboarding_completed)) {
       /*
         if Im currently on the boarding screen,
         there`s no point in going back to the
@@ -52,14 +53,13 @@ function RootLayoutNav() {
         point in proceeding to the next step!!!
       */
       const inOnboarding = segments[0] === 'onboarding';
-
       if (!inOnboarding) {
         router.replace('/onboarding');
       }
     }
-  }, [session, loaded, profile, segments]);
+  }, [session, loading, loaded, profile, segments]);
 
-  if (!loading && loading) {
+  if (loading || !loaded) {
     return (
       <View className="flex-1">
         <ActivityIndicator size={'large'} color="white" />
