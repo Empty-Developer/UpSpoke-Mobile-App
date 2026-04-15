@@ -1,5 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/utils/supabase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
@@ -16,6 +17,7 @@ import {
 } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
 
 const LEVELS = [
   {
@@ -84,7 +86,7 @@ export default function OnBoardingScreen() {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  
+  const { refreshProfile } = useAuth()
 
   // arrow button
   const handleBack = () => {
@@ -116,6 +118,7 @@ export default function OnBoardingScreen() {
       setStep(step + 1);
     } else {
       // TODO: Save profile
+      saveProfile()
     }
   };
 
@@ -157,7 +160,16 @@ export default function OnBoardingScreen() {
       })
 
       if (error) throw error
-    } catch (error) {}
+
+      await refreshProfile()
+
+      // TODO: show paywall
+      setShowPaywall(true)
+
+    } catch (error) {
+      console.error("Error saving profile: ", error)
+      toast.error("Ошибка сохранения профиля!. Пожалуйста попробуйте еще раз.")
+    }
   };
 
   // 4 function for rendering step by step...
