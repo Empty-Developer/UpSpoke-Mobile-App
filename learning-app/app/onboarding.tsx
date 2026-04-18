@@ -1,3 +1,4 @@
+import { Paywall } from '@/components/subscription/Paywall';
 import { ThemedText } from '@/components/themed-text';
 import { Colors } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -84,7 +85,7 @@ export default function OnBoardingScreen() {
   const [level, setLevel] = useState<string | null>(null);
   const [motivation, setMotivation] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [showPaywall, setShowPaywall] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(true);
 
   const { refreshProfile } = useAuth()
 
@@ -377,6 +378,7 @@ export default function OnBoardingScreen() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+      <Paywall visible={showPaywall} onClose={() => router.replace("/explore")}/>
     </SafeAreaView>
   );
 }
