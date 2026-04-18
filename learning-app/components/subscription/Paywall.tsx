@@ -107,7 +107,8 @@ export function Paywall({
   const selectedPlan = plans[billingCycle];
   const [isStartingTrial, setIsStartingTrial] = useState(false);
 
-  const handleStartTrial = async () => {};
+  const handleStartTrial = async () => {
+  };
 
   return (
     <Modal
@@ -144,7 +145,7 @@ export function Paywall({
             </Text>
             <View style={styles.subtitleView}>
               <Text style={styles.subtitle}>
-                Мы используем для изучения Convo!
+                Мы используем для изучения UpSpoke!
               </Text>
             </View>
           </View>
@@ -264,11 +265,39 @@ export function Paywall({
           {/* rating */}
           <View style={styles.rating}>
             <View style={styles.stars}>
-              {[...Array(5)].map((_, i) => (<Ionicons key={i} name='star' size={26} color={'#ffd700'} />))}
+              {[...Array(5)].map((_, i) => (
+                <Ionicons key={i} name="star" size={26} color={'#ffd700'} />
+              ))}
             </View>
             <Text style={styles.ratingText}>4.8/5 РЕЙТИНГ</Text>
             <Text style={styles.ratingSubtext}>10.000+ Обзоров В App Stor</Text>
           </View>
+          {/* testimonial */}
+          <View style={styles.testimonial}>
+            <Text style={styles.testimonialText}>
+              У UpSpoke лучшая программа для изучения языка! Я смог изучить
+              английский за пару месяцев. Всем рекомендую!
+            </Text>
+            <Text style={styles.testimonialAuthor}>
+              - App Store User from Russian Federation
+            </Text>
+          </View>
+          {/* legal link */}
+          <View style={styles.legalLinks}>
+            <Pressable>
+              <Text style={styles.legalLink}>Restore Purchase</Text>
+            </Pressable>
+            <Text style={styles.legalSeparator}>•</Text>
+            <Pressable>
+              <Text style={styles.legalLink}>Terms of Service</Text>
+            </Pressable>
+            <Text style={styles.legalSeparator}>•</Text>
+            <Pressable>
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.bottomSpacing}></View>
         </ScrollView>
       </SafeAreaView>
     </Modal>
@@ -566,7 +595,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
   },
   testimonial: {
-    backgroundColor: 'rgba(26, 26, 46, 0.7)',
+    backgroundColor: '#b19eff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
@@ -582,7 +611,7 @@ const styles = StyleSheet.create({
   },
   testimonialAuthor: {
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: 'rgba(0, 0, 0, 1)',
   },
   legalLinks: {
     flexDirection: 'row',
