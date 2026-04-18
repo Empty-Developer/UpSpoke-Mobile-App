@@ -76,17 +76,17 @@ const plans: { annual: Plan; monthly: Plan } = {
   annual: {
     id: 'premium_annual',
     name: 'Premium',
-    price: '799.00',
+    price: '79.00',
     period: 'на год',
     billingCycle: 'Ежегодная оплата',
     features: ['7-дневная бесплатная пробная версия', 'Отмена в любое время'],
     recommended: true,
-    savings: 'Сэкономьте 40%',
+    savings: '40%',
   },
   monthly: {
     id: 'premium_monthly',
     name: 'Premium',
-    price: '199.00',
+    price: '19.00',
     period: 'в месяц',
     billingCycle: 'Ежемесячный расчет',
     features: ['7-дневная бесплатная пробная версия', 'Отмена в любое время'],
@@ -100,6 +100,15 @@ export function Paywall({
   visible: boolean;
   onClose: () => void;
 }) {
+  const [billingCycle, setBillingCycle] = useState<'annual' | 'monthly'>(
+    'annual'
+  );
+
+  const selectedPlan = plans[billingCycle];
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
+
+  const handleStartTrial = async () => {};
+
   return (
     <Modal
       visible={visible}
@@ -145,11 +154,7 @@ export function Paywall({
             {features.map((features, index) => (
               <View key={index} style={styles.featureCard}>
                 <View style={styles.featureIcon}>
-                  <Ionicons
-                    name={features.icon}
-                    size={24}
-                    color={'#fff'}
-                  />
+                  <Ionicons name={features.icon} size={24} color={'#fff'} />
                 </View>
                 <Text style={styles.featureTitle}>{features.title}</Text>
                 <Text style={styles.featureDescription}>
@@ -157,6 +162,112 @@ export function Paywall({
                 </Text>
               </View>
             ))}
+          </View>
+          {/* billing cycle toggle */}
+          <View style={styles.toggleContainer}>
+            <Pressable
+              style={[
+                styles.toggleButton,
+                billingCycle === 'annual' && styles.toggleButtonActive,
+              ]}
+              onPress={() => setBillingCycle('annual')}
+            >
+              <Text
+                style={[
+                  styles.testimonialText,
+                  billingCycle === 'annual' && styles.toggleButtonActive,
+                ]}
+              >
+                Годовая
+              </Text>
+              {billingCycle === 'annual' && (
+                <View style={styles.savingsBadge}>
+                  <View style={styles.savingsBadge}>
+                    <Text style={styles.savingsText}>
+                      {plans.annual.savings}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </Pressable>
+            <Pressable
+              style={[
+                styles.toggleButton,
+                billingCycle === 'monthly' && styles.toggleButtonActive,
+              ]}
+              onPress={() => setBillingCycle('monthly')}
+            >
+              <Text
+                style={[
+                  styles.testimonialText,
+                  billingCycle === 'monthly' && styles.toggleButtonActive,
+                ]}
+              >
+                В месяц
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* plans */}
+          <View style={styles.planCard}>
+            {selectedPlan.recommended && (
+              <View style={styles.recommendedBadge}>
+                <Text style={styles.recommendedText}>ЛУЧШАЯ ЦЕНА</Text>
+              </View>
+            )}
+            <View style={styles.planHeader}>
+              <View>
+                <Text style={styles.planName}>{selectedPlan.name}</Text>
+                <Text style={styles.planBilling}>
+                  {selectedPlan.billingCycle}
+                </Text>
+              </View>
+              <View style={styles.planPriceContainer}>
+                <Text style={styles.planPrice}>{selectedPlan.price} USD</Text>
+                <Text style={styles.planPeriod}>{selectedPlan.period}</Text>
+              </View>
+            </View>
+            <View style={styles.planFeatures}>
+              {selectedPlan.features.map((feature, index) => (
+                <View key={index} style={styles.planFeatureItem}>
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={20}
+                    color={'#34C759'}
+                  />
+                  <Text style={styles.planFeatureText}>{feature}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+          {/* CTA button */}
+          <Pressable
+            style={[styles.ctaButton, isStartingTrial && { opacity: 0.7 }]}
+            onPress={handleStartTrial}
+            disabled={isStartingTrial}
+          >
+            <Ionicons
+              name="star"
+              size={20}
+              color={'#000'}
+              style={styles.ctaIcon}
+            />
+            <Text style={styles.ctaText}>
+              {isStartingTrial ? 'Загрузка...' : 'Начать бесплатную неделю!'}
+            </Text>
+          </Pressable>
+          {/* footer */}
+          <Text style={styles.footer}>Попробуйте 7 дней бесплатно.</Text>
+          <Text style={styles.footerNote}>
+            Мы отправим вам напоминание об окончании подписки.
+          </Text>
+          {/* rating */}
+          <View style={styles.rating}>
+            <View style={styles.stars}>
+              {[...Array(5)].map((_, i) => (<Ionicons key={i} name='star' size={26} color={'#ffd700'} />))}
+            </View>
+            <Text style={styles.ratingText}>4.8/5 РЕЙТИНГ</Text>
+            <Text style={styles.ratingSubtext}>10.000+ Обзоров В App Stor</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -210,7 +321,7 @@ const styles = StyleSheet.create({
   },
   introSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 10,
   },
   title: {
     fontSize: 26,
@@ -265,7 +376,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   featureTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700',
     color: '#000',
     marginBottom: 4,
@@ -295,7 +406,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   toggleButtonActive: {
-    backgroundColor: '#fff',
+    backgroundColor: '#131313',
   },
   toggleText: {
     fontSize: 16,
@@ -307,8 +418,8 @@ const styles = StyleSheet.create({
   },
   savingsBadge: {
     backgroundColor: '#34C759',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 3,
+    paddingVertical: 2,
     borderRadius: 6,
   },
   savingsText: {
@@ -327,13 +438,13 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
     borderWidth: 2,
-    borderColor: Colors.primaryAccentColor,
+    borderColor: '#FE6869',
   },
   recommendedBadge: {
     position: 'absolute',
     top: -12,
     alignSelf: 'center',
-    backgroundColor: Colors.primaryAccentColor,
+    backgroundColor: '#FE6869',
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
@@ -414,7 +525,7 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
+    color: '#000',
   },
   footer: {
     fontSize: 14,
@@ -433,8 +544,8 @@ const styles = StyleSheet.create({
   },
   rating: {
     alignItems: 'center',
-    marginBottom: 24,
-    paddingVertical: 24,
+    marginBottom: 10,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -465,9 +576,9 @@ const styles = StyleSheet.create({
   testimonialText: {
     fontSize: 15,
     color: '#fff',
+    fontWeight: 600,
     lineHeight: 22,
-    fontStyle: 'italic',
-    marginBottom: 12,
+    marginBottom: 0,
   },
   testimonialAuthor: {
     fontSize: 13,
