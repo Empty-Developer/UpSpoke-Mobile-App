@@ -6,6 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSpeakingListeningStats } from '@/hooks/use-speaking-listening-stats';
 import { useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function LessonsContent() {
   const colors = Colors['light'];
@@ -93,6 +94,10 @@ export default function LessonsContent() {
             </TouchableOpacity>
           </View>
         </View>
+        {/* main content */}
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
