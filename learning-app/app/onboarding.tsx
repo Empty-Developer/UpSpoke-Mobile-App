@@ -85,7 +85,7 @@ export default function OnBoardingScreen() {
   const [level, setLevel] = useState<string | null>(null);
   const [motivation, setMotivation] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [showPaywall, setShowPaywall] = useState(true);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const { refreshProfile } = useAuth()
 

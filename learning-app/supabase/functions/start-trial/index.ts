@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       id: user.id,
       is_premium: true,
       premium_expires_at: expiresAt,
-      updated_at: new Data().toISOString(),
+      updated_at: new Date().toISOString(),
     });
 
     if (updateError) throw updateError;

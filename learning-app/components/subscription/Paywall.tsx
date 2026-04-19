@@ -106,8 +106,27 @@ export function Paywall({
 
   const selectedPlan = plans[billingCycle];
   const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const {refreshProfile} = useAuth()
 
   const handleStartTrial = async () => {
+    try {
+      setIsStartingTrial(true)
+
+      const {error} = await supabase.functions.invoke("start-trial", {
+        body: { planId: selectedPlan.id },
+      })
+
+      if (error) throw error
+
+      await refreshProfile() // update user profile ^^
+      onClose()
+
+    } catch (error) {
+      console.error("Failed to start trial: ", error)
+      toast.error("Повторите попытку еще раз!")
+    } finally {
+      setIsStartingTrial(false)
+    }
   };
 
   return (
@@ -119,11 +138,11 @@ export function Paywall({
     >
       <SafeAreaView style={styles.container} edges={['top']}>
         <LinearGradient
-          colors={['#13140C', '#13140C']}
+          colors={['#13140C', '#13142C']}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.gradient}
-          locations={[0, 0.4, 1]}
+          locations={[0, 1]}
         />
         {/* Header */}
         <View style={styles.header}>
@@ -183,11 +202,9 @@ export function Paywall({
               </Text>
               {billingCycle === 'annual' && (
                 <View style={styles.savingsBadge}>
-                  <View style={styles.savingsBadge}>
-                    <Text style={styles.savingsText}>
-                      {plans.annual.savings}
-                    </Text>
-                  </View>
+                  <Text style={styles.savingsText}>
+                    {plans.annual.savings}
+                  </Text>
                 </View>
               )}
             </Pressable>
@@ -605,7 +622,7 @@ const styles = StyleSheet.create({
   testimonialText: {
     fontSize: 15,
     color: '#fff',
-    fontWeight: 600,
+    fontWeight: '600',
     lineHeight: 22,
     marginBottom: 0,
   },
