@@ -21,7 +21,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="lessons"
         options={{
-          title: "Lessons",
+          title: "Уроки",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="school" color={color} />
           ),
@@ -30,7 +30,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="conversations"
         options={{
-          title: "Conversations",
+          title: "Диалог",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="chatbubbles-sharp" color={color} />
           ),
@@ -39,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: "Профиль",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="person-circle-outline" color={color} />
           ),

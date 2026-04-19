@@ -1,0 +1,7 @@
+{
+  "deno.enable": true,
+  "deno.enablePaths": ["supabase/functions"],
+  "deno.path": "/opt/homebrew/bin/deno",
+  "typescript.validate.enable": false, 
+  "javascript.validate.enable": false
+}
