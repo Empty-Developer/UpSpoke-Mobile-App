@@ -38,9 +38,10 @@ function RootLayoutNav() {
 
   // user are immediately redirected to the screen, sipping th registration screen
   useEffect(() => {
-    if (loading || !loaded) return
+    if (!loaded || loading) return;
+    if (!session) return;
     // all data user, I use it for requests
-    if (session && (!profile || !profile.onboarding_completed)) {
+    if (!profile || !profile.onboarding_completed) {
       /*
         if Im currently on the boarding screen,
         there`s no point in going back to the
@@ -55,6 +56,10 @@ function RootLayoutNav() {
       const inOnboarding = segments[0] === 'onboarding';
       if (!inOnboarding) {
         router.replace('/onboarding');
+      }
+    } else {
+      if (segments[0] !== '(tabs)') {
+        router.replace('/(tabs)/lessons');
       }
     }
   }, [session, loading, loaded, profile, segments]);
@@ -86,6 +91,12 @@ function RootLayoutNav() {
     <ThemeProvider value={DefaultTheme}>
       <GestureHandlerRootView className="flex-1">
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="onboarding" />
         </Stack>
