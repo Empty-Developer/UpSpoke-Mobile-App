@@ -34,7 +34,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
 const videoSource = require('@/assets/videos/broll.mp4');
-const logoSource = require('@/assets/images/logo.png');
+const logoSource = require('@/assets/images/ico.png');
 
 const MENU_HEIGHT = 250;
 const PEEK_MENU_HEIGHT = 50;
@@ -271,55 +271,55 @@ export default function IntroScreen() {
             source={logoSource}
             className="w-[25px] h-[25px] mr-[5px] rounded-xl"
           />
-          <Text className="text-[18px] font-bold text-white">UpSpoke</Text>
+          <Text className="text-[18px] font-bold text-[#1e1f22]">UpSpoke</Text>
         </View>
         <View className="items-center">
-          <Text className="text-base font-semibold text-white">Let's go!</Text>
+          <Text className="text-base font-semibold text-[#717272]">Let's go!</Text>
         </View>
       </View>
       <View className="gap-4">
         {/* Apple */}
         <Pressable
-          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-2xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          className="px-[20px] min-h-[60px] justify-center items-center flex-row py-3 rounded-3xl bg-[#D4FF5F]"
           onPress={() => console.log('Apple login')}
         >
           <AntDesign
             name="apple"
-            size={16}
-            color="white"
+            size={22}
+            color="black"
             className="mr-[12px]"
           />
-          <Text className="tracking-[-0.2px] font-medium text-white text-[17px]">
+          <Text className="tracking-[-0.2px] font-semibold text-black text-[18px]">
             Войти с помощью Apple
           </Text>
         </Pressable>
         {/* Google */}
         <Pressable
-          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-2xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          className="px-[20px] min-h-[60px] justify-center items-center flex-row py-3 rounded-3xl bg-[#D4FF5F]"
           onPress={() => console.log('Google login')}
         >
           <AntDesign
             name="google"
-            size={16}
-            color="white"
+            size={22}
+            color="black"
             className="mr-[12px]"
           />
-          <Text className="tracking-[-0.2px] font-medium text-white text-[17px]">
+          <Text className="tracking-[-0.2px] font-semibold text-black text-[18px]">
             Войти с помощью Google
           </Text>
         </Pressable>
         {/* Email */}
         <Pressable
-          className="px-[20px] min-h-[40px] justify-center items-center flex-row py-3 rounded-2xl border-[1px] bg-[#3c3c43] border-[#787880]/40"
+          className="px-[20px] min-h-[60px] justify-center items-center flex-row py-3 rounded-3xl bg-[#D4FF5F]"
           onPress={() =>animatedToEmailView('email')}
         >
           <Fontisto
             name="email"
-            size={16}
-            color="white"
+            size={22}
+            color="black"
             className="mr-[12px]"
           />
-          <Text className="tracking-[-0.2px] font-medium text-white text-[17px]">
+          <Text className="ttracking-[-0.2px] font-semibold text-black text-[18px]">
             Войти с помощью Email
           </Text>
         </Pressable>
@@ -387,7 +387,7 @@ export default function IntroScreen() {
             menuAnimatedStyle,
             { height: dynamicMenuHeight, paddingBottom: insets.bottom + 30 },
           ]}
-          className="bottom-0 left-0 right-0 bg-black/60 z-[30] absolute border-white/15 border-r-[1.5px] border-l-[1.5px] border-t-[1.5px] rounded-t-[24px]"
+          className="bottom-0 left-0 right-0 bg-[#ffffff] z-[30] absolute border-white/15 border-r-[1.5px] border-l-[1.5px] border-t-[1.5px] rounded-t-[24px]"
         >
           <Pressable
             style={{
@@ -396,7 +396,7 @@ export default function IntroScreen() {
             }}
             onPress={handlePress}
           >
-            <View className="w-[40px] h-[4px] bg-white/50 rounded-full" />
+            <View className="w-[40px] h-[4px] bg-black/20 rounded-full" />
           </Pressable>
 
           <View className="flex-1 px-[30px]">

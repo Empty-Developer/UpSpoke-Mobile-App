@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/theme';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,6 +7,10 @@ import { useSpeakingListeningStats } from '@/hooks/use-speaking-listening-stats'
 import { useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
+import { COURSE_DATE } from '@/constants/CourseData';
+import { ThemedText } from '@/components/themed-text';
+
+const MAX_STARS = 3;
 
 export default function LessonsContent() {
   const colors = Colors['light'];
@@ -27,6 +31,93 @@ export default function LessonsContent() {
     }, [refresh])
   );
 
+  const renderCompletionStatus = (count: number) => {
+    const elements = [];
+    const starsToDisplay = Math.min(count, MAX_STARS);
+
+    for (let i = 1; i <= MAX_STARS; i++) {
+      elements.push(
+        <Ionicons
+          key={`start-${i}`}
+          name={i <= starsToDisplay ? 'star' : 'star-outline'}
+          size={16}
+          color={i <= starsToDisplay ? '#ffd700' : Colors.subduedTextColor}
+          style={styles.starIcon}
+        />
+      );
+    }
+
+    if (count > MAX_STARS) {
+      const extraCount = count - MAX_STARS;
+      elements.push(
+        <ThemedText key={'extra-count'} style={[styles.extraCountText, {color: Colors.subduedTextColor}]}>
+          +{extraCount}
+        </ThemedText>
+      );
+    }
+
+    return (
+      <View style={styles.completionStarsContainer}>
+        {elements}
+      </View>
+    )
+  };
+
+  const renderLessonNode = (
+    lesson: Lesson,
+    index: number,
+    chapterLessons: any[]
+  ) => {
+    const isLastLesson = index === chapterLessons.length - 1;
+    const alignment = index % 2 === 0 ? 'flex-start' : 'flex-end';
+    const completeCount = 1;
+    const isMastered = completeCount >= MAX_STARS;
+
+    return (
+      <View
+        key={lesson.id}
+        style={[styles.lessonNodeContainer, { alignItems: alignment }]}
+      >
+        {!isLastLesson && (
+          <View
+            style={[
+              styles.pathLine,
+              {
+                alignSelf: alignment,
+                transform: [
+                  { translateX: alignment === 'flex-start' ? 160 : -160 },
+                  { rotate: alignment === 'flex-start' ? '15deg' : '-15deg' },
+                ],
+              },
+            ]}
+          />
+        )}
+        <TouchableOpacity
+          style={[
+            styles.lessonBubble,
+            {
+              backgroundColor: colors.background,
+              borderColor: isMastered
+                ? Colors.primaryAccentColor
+                : Colors.borderColor,
+            },
+          ]}
+          onPress={() => {}}
+        >
+          <Ionicons
+            name={lesson.icon || 'book-outline'}
+            size={28}
+            color={'#000'}
+          />
+          <View style={styles.lessonTextContainer}>
+            <ThemedText style={styles.lessonTitle}>{lesson.title}</ThemedText>
+            {renderCompletionStatus(completeCount)}
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       {/* header */}
@@ -35,35 +126,37 @@ export default function LessonsContent() {
           style={[styles.header, { borderBottomColor: Colors.borderColor }]}
         >
           <TouchableOpacity>
-            <Text style={styles.headerTitle}>Week</Text>
-            <Text
+            <ThemedText style={styles.headerTitle}>Week</ThemedText>
+            <ThemedText
               style={
                 (styles.headerSubtitle, { color: Colors.subduedTextColor })
               }
             >
               В обзоре
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
 
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.starIcon}>
               <View style={styles.statValueContainer}>
-                <Text style={styles.statValue}>
+                <ThemedText style={styles.statValue}>
                   {loading ? '-' : Math.floor(stats?.minutesSpoken ?? 0)}
-                </Text>
+                </ThemedText>
                 <Ionicons
                   name="arrow-up"
                   size={14}
                   color="#34C759"
                   style={{ marginLeft: 2 }}
                 />
-                <Text style={styles.statChangePositive}>{Math.floor(stats?.weeklyChange.spoken ?? 0)}</Text>
+                <ThemedText style={styles.statChangePositive}>
+                  {Math.floor(stats?.weeklyChange.spoken ?? 0)}
+                </ThemedText>
               </View>
-              <Text
+              <ThemedText
                 style={[styles.statLabel, { color: Colors.subduedTextColor }]}
               >
                 Время общения
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           </View>
 
@@ -77,26 +170,51 @@ export default function LessonsContent() {
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.starIcon}>
               <View style={styles.statValueContainer}>
-                <Text style={styles.statValue}>{loading ? '-' : Math.floor(stats?.minutesListened ?? 0)}</Text>
+                <ThemedText style={styles.statValue}>
+                  {loading ? '-' : Math.floor(stats?.minutesListened ?? 0)}
+                </ThemedText>
                 <Ionicons
                   name="arrow-up"
                   size={14}
                   color="#34C759"
                   style={{ marginLeft: 2 }}
                 />
-                <Text style={styles.statChangePositive}>{Math.floor(stats?.weeklyChange.listened ?? 0)}</Text>
+                <ThemedText style={styles.statChangePositive}>
+                  {Math.floor(stats?.weeklyChange.listened ?? 0)}
+                </ThemedText>
               </View>
-              <Text
+              <ThemedText
                 style={[styles.statLabel, { color: Colors.subduedTextColor }]}
               >
                 Время прослушивания
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           </View>
         </View>
         {/* main content */}
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {COURSE_DATE.chapters.map((chapter) => (
+            <View key={chapter.id} style={styles.chapterContainer}>
+              <View style={styles.chapterHeader}>
+                <ThemedText style={styles.chapterNumberText}>
+                  блок {chapter.id}
+                </ThemedText>
+                <ThemedText type="title" style={styles.chapterTitleText}>
+                  {chapter.title}
+                </ThemedText>
+              </View>
 
+              <View style={styles.lessonsWrapper}>
+                {chapter.lessons &&
+                  chapter.lessons.map((lesson, index) =>
+                    renderLessonNode(lesson, index, chapter.lessons)
+                  )}
+              </View>
+            </View>
+          ))}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -239,5 +357,15 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  pathLine: {
+    position: 'absolute',
+    top: 60,
+    width: 4,
+    height: 60,
+    borderStyle: 'dotted',
+    borderLeftWidth: 4,
+    borderColor: Colors.primaryAccentColor,
+    zIndex: -1,
   },
 });

@@ -53,15 +53,15 @@ export default function EmailAuth({
     <Animated.View className="flex-1" style={[menuContentAnimatedStyle]}>
       <View className="flex-row items-center justify-between mt-[20px] mb-[20px]">
         <Pressable onPress={onBack}>
-          <Entypo name="chevron-thin-left" size={18} color="white" />
+          <Entypo name="chevron-thin-left" size={18} color="black" />
         </Pressable>
       </View>
       {/* title */}
       <View className="mb-[20px]">
-        <Text className="text-[24px] font-semibold text-white mb-[8px] leading-[34px]">
+        <Text className="text-[24px] font-semibold text-black mb-[8px] leading-[34px]">
           Введите Email адрес.
         </Text>
-        <Text className="text-[16px] font-normal text-white/70">
+        <Text className="text-[16px] font-normal text-black">
           Мы отправим вам ссылку для входа.
         </Text>
       </View>
@@ -69,18 +69,18 @@ export default function EmailAuth({
       <View className="gap-5">
         <View className="gap-2">
           <TextInput
-            className="px-4 py-4 text-[16px] text-white bg-white/10 border-white/20 border-[1px] rounded-2xl min-h-[52px]"
+            className="px-4 py-6 text-[16px] text-black bg-white/10 border-black/20 border-[1px] rounded-3xl min-h-[52px]"
             value={email}
             onChangeText={setEmail}
             placeholder="Email"
-            placeholderTextColor={'rgba(255, 255, 255, 0.4)'}
+            placeholderTextColor={'rgba(0, 0, 0, 0.4)'}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
           />
         </View>
         <Pressable
-          className={`bg-[#D4FF5F] rounded-2xl px-5 py-4 items-center justify-center mt-[10px] min-h-[52px] ${loading ? 'opacity-60' : ''}`}
+          className={`bg-[#D4FF5F] rounded-3xl px-5 py-6 items-center justify-center mt-[10px] min-h-[52px] ${loading ? 'opacity-60' : ''}`}
           disabled={loading}
           onPress={signInWithEmail}
         >

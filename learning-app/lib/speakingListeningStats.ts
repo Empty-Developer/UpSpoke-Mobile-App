@@ -20,7 +20,7 @@ const readStats = async (): Promise<SpeakingListeningStats> => {
     const raw = await AsyncStorage.getItem(STATS_KEY);
 
     if (!raw) {
-      return;
+      return getDefaultStats();
     }
 
     return JSON.parse(raw) as SpeakingListeningStats;
