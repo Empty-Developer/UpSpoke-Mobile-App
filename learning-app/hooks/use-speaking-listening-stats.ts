@@ -1,5 +1,5 @@
 import { getWeeklyStats } from '@/lib/speakingListeningStats';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface WeeklyStats {
   minutesSpoken: number;
@@ -14,7 +14,8 @@ export const useSpeakingListeningStats = () => {
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
+    setLoading(true)
     try {
       const weeklyStats = await getWeeklyStats();
 
@@ -25,7 +26,7 @@ export const useSpeakingListeningStats = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refresh();

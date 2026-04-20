@@ -4,20 +4,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSpeakingListeningStats } from '@/hooks/use-speaking-listening-stats';
-import { useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
-import { COURSE_DATE } from '@/constants/CourseData';
+import { Chapter, COURSE_DATE } from '@/constants/CourseData';
 import { ThemedText } from '@/components/themed-text';
+import { getAllProgress, LessonProgress } from '@/lib/lessonProgress';
 
 const MAX_STARS = 3;
 
 export default function LessonsContent() {
   const colors = Colors['light'];
-  const [loaded] = useFonts({
-    GeistMono: require('@/assets/fonts/Geist-Regular.ttf'),
-  });
+
   const { stats, loading, refresh } = useSpeakingListeningStats();
+  const [progress, setProgress] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    // determine, because progress
+    loadProgress()
+  }, [])
+
+  const loadProgress = async () => {
+    const savedProgress = await getAllProgress()
+    setProgress(savedProgress)
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -28,8 +38,22 @@ export default function LessonsContent() {
       function is create
     */
       refresh();
+      loadProgress()
     }, [refresh])
   );
+
+  const handleLessonPress = (lesson: Lesson) => {
+    router.push({pathname: "/practice", params: {lessonId: lesson.id}})
+  }
+
+  const handlePracticeChapterPress = (chapter: Chapter) => {
+    if (chapter.review) {
+      router.push({
+        pathname: "/practice",
+        params: { lessonId: chapter.review.id}
+      })
+    }
+  }
 
   const renderCompletionStatus = (count: number) => {
     const elements = [];
@@ -70,7 +94,7 @@ export default function LessonsContent() {
   ) => {
     const isLastLesson = index === chapterLessons.length - 1;
     const alignment = index % 2 === 0 ? 'flex-start' : 'flex-end';
-    const completeCount = 1;
+    const completeCount = progress[lesson.id] || 0;
     const isMastered = completeCount >= MAX_STARS;
 
     return (
@@ -102,7 +126,7 @@ export default function LessonsContent() {
                 : Colors.borderColor,
             },
           ]}
-          onPress={() => {}}
+          onPress={() => handleLessonPress(lesson)}
         >
           <Ionicons
             name={lesson.icon || 'book-outline'}
@@ -213,6 +237,18 @@ export default function LessonsContent() {
                     renderLessonNode(lesson, index, chapter.lessons)
                   )}
               </View>
+              {chapter.review && (
+                <TouchableOpacity
+                  style={[
+                    styles.practiceChapterButton,
+                    { backgroundColor: Colors.primaryAccentColor}
+                  ]}
+                  onPress={() => handlePracticeChapterPress(chapter)}
+                >
+                  <Ionicons name='flash' size={20} color='#000'/>
+                  <ThemedText style={styles.practiceChapterButtonText}>Тема '{chapter.title}'</ThemedText>
+                </TouchableOpacity>
+              )}
             </View>
           ))}
         </ScrollView>
@@ -354,7 +390,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   practiceChapterButtonText: {
-    color: '#FFF',
+    color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
   },
