@@ -11,7 +11,11 @@ interface WeeklyStats {
 }
 
 export const useSpeakingListeningStats = () => {
-  const [stats, setStats] = useState<WeeklyStats | null>(null);
+  const [stats, setStats] = useState<WeeklyStats>({
+    minutesSpoken: 0,
+    minutesListened: 0,
+    weeklyChange: {spoken: 0, listened: 0}
+  });
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -19,7 +23,9 @@ export const useSpeakingListeningStats = () => {
     try {
       const weeklyStats = await getWeeklyStats();
 
-      setStats(weeklyStats);
+      if (weeklyStats) {
+        setStats(weeklyStats);
+      }
     } catch (error) {
       // console.error('Failed to load speaking/listening stats: ', error);
       console.log("Failed to load speaking/listening stats: ", error)

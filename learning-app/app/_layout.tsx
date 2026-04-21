@@ -58,7 +58,8 @@ function RootLayoutNav() {
         router.replace('/onboarding');
       }
     } else {
-      if (segments[0] !== '(tabs)') {
+      const isAllowedScreen = segments[0] === '(tabs)' || segments[0] === 'practice'
+      if (!isAllowedScreen) {
         router.replace('/(tabs)/lessons');
       }
     }

@@ -7,7 +7,7 @@ import { useSpeakingListeningStats } from '@/hooks/use-speaking-listening-stats'
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Chapter, COURSE_DATE } from '@/constants/CourseData';
+import { Chapter, COURSE_DATE, Lesson } from '@/constants/CourseData';
 import { ThemedText } from '@/components/themed-text';
 import { getAllProgress, LessonProgress } from '@/lib/lessonProgress';
 
@@ -17,17 +17,17 @@ export default function LessonsContent() {
   const colors = Colors['light'];
 
   const { stats, loading, refresh } = useSpeakingListeningStats();
-  const [progress, setProgress] = useState<Record<string, number>>({})
+  const [progress, setProgress] = useState<Record<string, number>>({});
 
   useEffect(() => {
     // determine, because progress
-    loadProgress()
-  }, [])
+    loadProgress();
+  }, []);
 
   const loadProgress = async () => {
-    const savedProgress = await getAllProgress()
-    setProgress(savedProgress)
-  }
+    const savedProgress = await getAllProgress();
+    setProgress(savedProgress);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -38,22 +38,24 @@ export default function LessonsContent() {
       function is create
     */
       refresh();
-      loadProgress()
+      loadProgress();
     }, [refresh])
   );
 
   const handleLessonPress = (lesson: Lesson) => {
-    router.push({pathname: "/practice", params: {lessonId: lesson.id}})
-  }
+    // console.log(lesson.id)
+    // router.push(`./practice?lessonId=${lesson.id}`); // fuck it is
+    router.push({ pathname: '/practice', params: { lessonId: lesson.id } });
+  };
 
   const handlePracticeChapterPress = (chapter: Chapter) => {
     if (chapter.review) {
-      router.push({
-        pathname: "/practice",
-        params: { lessonId: chapter.review.id}
-      })
+      router.replace({
+        pathname: '/practice',
+        params: { lessonId: chapter.review.id },
+      });
     }
-  }
+  };
 
   const renderCompletionStatus = (count: number) => {
     const elements = [];
@@ -62,7 +64,7 @@ export default function LessonsContent() {
     for (let i = 1; i <= MAX_STARS; i++) {
       elements.push(
         <Ionicons
-          key={`start-${i}`}
+          key={`star-${i}`}
           name={i <= starsToDisplay ? 'star' : 'star-outline'}
           size={16}
           color={i <= starsToDisplay ? '#ffd700' : Colors.subduedTextColor}
@@ -74,17 +76,16 @@ export default function LessonsContent() {
     if (count > MAX_STARS) {
       const extraCount = count - MAX_STARS;
       elements.push(
-        <ThemedText key={'extra-count'} style={[styles.extraCountText, {color: Colors.subduedTextColor}]}>
+        <ThemedText
+          key={'extra-count'}
+          style={[styles.extraCountText, { color: Colors.subduedTextColor }]}
+        >
           +{extraCount}
         </ThemedText>
       );
     }
 
-    return (
-      <View style={styles.completionStarsContainer}>
-        {elements}
-      </View>
-    )
+    return <View style={styles.completionStarsContainer}>{elements}</View>;
   };
 
   const renderLessonNode = (
@@ -143,18 +144,22 @@ export default function LessonsContent() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={['top', 'left', 'right']}
+    >
       {/* header */}
       <View style={styles.container}>
         <View
           style={[styles.header, { borderBottomColor: Colors.borderColor }]}
         >
           <TouchableOpacity>
-            <ThemedText style={styles.headerTitle}>Week</ThemedText>
+            <ThemedText style={styles.headerTitle}>UpSpoke</ThemedText>
             <ThemedText
-              style={
-                (styles.headerSubtitle, { color: Colors.subduedTextColor })
-              }
+              style={[
+                styles.headerSubtitle,
+                { color: Colors.subduedTextColor },
+              ]}
             >
               В обзоре
             </ThemedText>
@@ -241,12 +246,14 @@ export default function LessonsContent() {
                 <TouchableOpacity
                   style={[
                     styles.practiceChapterButton,
-                    { backgroundColor: Colors.primaryAccentColor}
+                    { backgroundColor: Colors.primaryAccentColor },
                   ]}
                   onPress={() => handlePracticeChapterPress(chapter)}
                 >
-                  <Ionicons name='flash' size={20} color='#000'/>
-                  <ThemedText style={styles.practiceChapterButtonText}>Тема '{chapter.title}'</ThemedText>
+                  <Ionicons name="flash" size={20} color="#000" />
+                  <ThemedText style={styles.practiceChapterButtonText}>
+                    Тема '{chapter.title}'
+                  </ThemedText>
                 </TouchableOpacity>
               )}
             </View>
