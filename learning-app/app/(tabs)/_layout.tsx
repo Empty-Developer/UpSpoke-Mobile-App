@@ -1,12 +1,12 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
+import React from "react";
 
-import { HapticTab } from '../../components/haptic-tab';
+import { HapticTab } from "../../components/haptic-tab";
 // import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from '../../constants/theme';
-import { useColorScheme } from '../../hooks/use-color-scheme';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { View } from 'react-native';
+import { Colors } from "../../constants/theme";
+import { useColorScheme } from "../../hooks/use-color-scheme";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { View } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,9 +14,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#A5E200', // active
-        tabBarInactiveTintColor:
-          Colors[colorScheme ?? 'light'].subduedTextColor,
+        tabBarActiveTintColor: '#000', // active
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].subduedTextColor,
         headerShown: false,
         tabBarButton: HapticTab,
 
@@ -39,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="lessons"
         options={{
-          title: 'Уроки',
+          title: "Уроки",
           tabBarIcon: ({ color, focused }) => (
             <View style={{ alignItems: 'center' }}>
               <Ionicons size={focused ? 30 : 28} name="school" color={color} />
@@ -50,14 +49,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="conversations"
         options={{
-          title: 'Диалог',
+          title: "Диалог",
           tabBarIcon: ({ color, focused }) => (
             <View style={{ alignItems: 'center' }}>
-              <Ionicons
-                size={focused ? 30 : 28}
-                name="chatbubbles-sharp"
-                color={color}
-              />
+              <Ionicons size={focused ? 30 : 28} name="chatbubbles-sharp" color={color} />
             </View>
           ),
         }}
@@ -65,14 +60,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Профиль',
+          title: "Профиль",
           tabBarIcon: ({ color, focused }) => (
             <View style={{ alignItems: 'center' }}>
-              <Ionicons
-                size={focused ? 30 : 28}
-                name="person-circle-outline"
-                color={color}
-              />
+              <Ionicons size={focused ? 30 : 28} name="person-circle-outline" color={color} />
             </View>
           ),
         }}
