@@ -5,6 +5,8 @@ import { View, Text, StyleSheet } from 'react-native';
 import ProgressHeader from './ProgressHeader';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { router } from 'expo-router';
+import { ThemedText } from '../themed-text';
+import FlashCard from './FleshCard';
 
 interface StudyCard {
   key: string;
@@ -136,13 +138,13 @@ export default function VocabularyIntroScreen({
         visible={exitConfirmVisible}
         title="Выйти с практики"
         description="Вы уверены что хотите выйти? Ваш прогресс будет не сохранен!"
-        cancelLabel='Отмена'
-        confirmLabel='Выход'
+        cancelLabel="Отмена"
+        confirmLabel="Выход"
         destructive
         onCancel={() => setExitConfirmVisible(false)}
         onConfirm={() => {
-          setExitConfirmVisible(false)
-          router.push("/lessons")
+          setExitConfirmVisible(false);
+          router.push('/lessons');
         }}
       />
       <ProgressHeader
@@ -151,6 +153,24 @@ export default function VocabularyIntroScreen({
         totalCount={state.total}
         onClose={() => setExitConfirmVisible(true)}
       />
+
+      <View style={styles.content}>
+        <View style={styles.instructionContainer}>
+          <ThemedText style={styles.instructionTitle}>Лексика Урока</ThemedText>
+          <ThemedText style={styles.instructionText}>
+            Нажмите на карточку что-бы ее перевернуть.
+          </ThemedText>
+        </View>
+        {currentCard ? (
+          <View style={styles.flashcardContainer}>
+            <FlashCard
+              key={currentCard.key}
+              word={currentCard.word}
+              direction={currentCard.direction}
+            />
+          </View>
+        ) : null}
+      </View>
     </View>
   );
 }
