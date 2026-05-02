@@ -1,7 +1,7 @@
 import { Question } from '@/constants/CourseData';
 import { Colors } from '@/constants/theme';
-import { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import ProgressHeader from './ProgressHeader';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { router } from 'expo-router';
@@ -79,7 +79,7 @@ const buildDeck = (words: Word[]): DeckBuckets => {
 
 const initializeStudyState = (deck: DeckBuckets): StudyState => {
   const cards: Record<string, StudyCard> = {};
-  [...deck.recognition, ...deck.recognition].forEach((entry) => {
+  [...deck.recognition, ...deck.recall].forEach((entry) => {
     cards[entry.key] = entry;
   });
 
@@ -123,6 +123,51 @@ export default function VocabularyIntroScreen({
     onStartLesson,
   ]);
 
+  const handleGrade = useCallback((grade: 'again' | 'good') => {
+    setState((prev) => {
+      if (!prev.queue.length) {
+        return prev;
+      }
+
+      const [activeKey, ...restQueue] = prev.queue;
+      const entry = prev.cards[activeKey];
+
+      if (!entry) {
+        return { ...prev, queue: restQueue };
+      }
+
+      let queue = [...restQueue];
+      let completed = prev.completed;
+      let phase: StudyPhase = prev.phase;
+      let recallKeys = prev.recallKeys;
+
+      if (grade === 'again') {
+        const insertIndex = Math.min(2, queue.length);
+        queue.splice(insertIndex, 0, activeKey);
+      } else {
+        completed = Math.min(prev.total, prev, completed + 1);
+      }
+
+      if (
+        queue.length === 0 &&
+        phase === 'recognition' &&
+        recallKeys.length > 0
+      ) {
+        queue = [...recallKeys];
+        recallKeys = [];
+        phase = 'recall';
+      }
+
+      return {
+        ...prev,
+        queue,
+        completed,
+        phase,
+        recallKeys,
+      };
+    });
+  }, []);
+
   const progressPercent =
     state.total === 0 ? 0 : (state.completed / state.total) * 100;
 
@@ -156,9 +201,11 @@ export default function VocabularyIntroScreen({
 
       <View style={styles.content}>
         <View style={styles.instructionContainer}>
-          <ThemedText style={styles.instructionTitle}>Лексика Урока</ThemedText>
+          <ThemedText style={styles.instructionTitle}>
+            Слова в Английском
+          </ThemedText>
           <ThemedText style={styles.instructionText}>
-            Нажмите на карточку что-бы ее перевернуть.
+            Нажмите по карте что-бы перевернуть ее.
           </ThemedText>
         </View>
         {currentCard ? (
@@ -170,6 +217,34 @@ export default function VocabularyIntroScreen({
             />
           </View>
         ) : null}
+
+        <View style={styles.bottomActions}>
+          <View style={styles.gradeButtons}>
+            <Pressable
+              onPress={() => handleGrade('again')}
+              style={styles.againButton}
+            >
+              <ThemedText style={styles.gradeButtonText}>Занова</ThemedText>
+            </Pressable>
+            <Pressable
+              onPress={() => handleGrade('good')}
+              style={styles.gotItButton}
+            >
+              <ThemedText style={styles.gradeButtonTextBlack}>
+                Дальше
+              </ThemedText>
+            </Pressable>
+          </View>
+
+          <Pressable
+            onPress={onStartLesson}
+            style={(styles.skipButtonPressed, styles.skipButton)}
+          >
+            <ThemedText style={styles.skipButtonText}>
+              Пропустить Урок
+            </ThemedText>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -210,45 +285,50 @@ const styles = StyleSheet.create({
   bottomActions: {
     marginTop: 'auto',
     paddingTop: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 16,
   },
   gradeButtons: {
     flexDirection: 'row',
     width: '100%',
     gap: 12,
-  },
-  gradeButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: 'center',
+    display: 'flex',
     justifyContent: 'center',
-    borderWidth: 2,
   },
   againButton: {
     backgroundColor: '#f3f4f6',
     borderColor: '#d1d5db',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 57,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   gotItButton: {
     backgroundColor: Colors.primaryAccentColor,
     borderColor: Colors.primaryAccentColor,
-  },
-  disabledButton: {
-    opacity: 0.4,
-  },
-  pressedButton: {
-    opacity: 0.7,
-    transform: [{ scale: 0.98 }],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 57,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   gradeButtonText: {
     fontSize: 17,
     fontWeight: '600',
     color: '#374151',
   },
-  gradeButtonTextWhite: {
+  gradeButtonTextBlack: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#ffffff',
+    color: '#000',
   },
   skipButton: {
     width: '100%',
