@@ -145,7 +145,7 @@ export default function VocabularyIntroScreen({
         const insertIndex = Math.min(2, queue.length);
         queue.splice(insertIndex, 0, activeKey);
       } else {
-        completed = Math.min(prev.total, prev, completed + 1);
+        completed = Math.min(prev.total, prev.completed + 1);
       }
 
       if (
@@ -167,6 +167,11 @@ export default function VocabularyIntroScreen({
       };
     });
   }, []);
+
+  if (deck.total === 0) {
+    onStartLesson()
+    return null;
+  }
 
   const progressPercent =
     state.total === 0 ? 0 : (state.completed / state.total) * 100;
@@ -222,12 +227,14 @@ export default function VocabularyIntroScreen({
           <View style={styles.gradeButtons}>
             <Pressable
               onPress={() => handleGrade('again')}
+              disabled={!currentCard}
               style={styles.againButton}
             >
               <ThemedText style={styles.gradeButtonText}>Занова</ThemedText>
             </Pressable>
             <Pressable
               onPress={() => handleGrade('good')}
+              disabled={!currentCard}
               style={styles.gotItButton}
             >
               <ThemedText style={styles.gradeButtonTextBlack}>

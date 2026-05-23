@@ -61,14 +61,14 @@ export default function FlashCard({
 
     return (
       <View style={styles.mandarinContent}>
-        <ThemedText style={styles.pinyin}>{word.hanzi}</ThemedText>
         <ThemedText style={styles.hanzi}>{word.pinyin}</ThemedText>
+        <ThemedText style={styles.pinyin}>{word.hanzi}</ThemedText>
       </View>
     );
   };
 
   const backContent = () => {
-    if (direction === 'zx-en') {
+    if (direction === 'en-zh') {
       return (
         <View style={styles.mandarinContent}>
           <ThemedText style={[styles.pinyin, styles.mandarinBackText]}>
